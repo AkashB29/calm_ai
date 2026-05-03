@@ -92,11 +92,11 @@ const Icon = {
     </svg>
   ),
   X: () => (
-    <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+    <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
       <path
         d="M3 3l10 10M13 3L3 13"
         stroke="currentColor"
-        strokeWidth="1.6"
+        strokeWidth="1.8"
         strokeLinecap="round"
       />
     </svg>
@@ -175,6 +175,17 @@ const Icon = {
       />
     </svg>
   ),
+  Link: ({ size = 14 }: { size?: number }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <path
+        d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  ),
 };
 
 /* ─── Step dot ───────────────────────────────────────────────────────────── */
@@ -227,7 +238,7 @@ function Toast({ text, visible }: { text: string; visible: boolean }) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   OPEN LINK DIALOG  — shown before navigating; includes voice toggle
+   OPEN LINK DIALOG  — gorgeous redesign
 ═══════════════════════════════════════════════════════════════════════════ */
 interface OpenLinkDialogProps {
   url: string;
@@ -245,205 +256,289 @@ function OpenLinkDialog({
   onCancel,
 }: OpenLinkDialogProps) {
   const [useVoice, setUseVoice] = useState(true);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    requestAnimationFrame(() => setMounted(true));
+  }, []);
 
   return (
-    /* backdrop */
     <div
-      className="fixed inset-0 z-[90] flex items-end sm:items-center justify-center px-4 pb-5 sm:pb-0"
-      style={{ background: "rgba(5,4,18,0.85)", backdropFilter: "blur(14px)" }}
+      className="fixed inset-0 z-[90] flex items-end sm:items-center justify-center sm:px-4 pb-0 sm:pb-0"
+      style={{
+        background: "rgba(4,3,15,0.80)",
+        backdropFilter: "blur(20px)",
+        WebkitBackdropFilter: "blur(20px)",
+      }}
     >
-      {/* sheet */}
+      {/* Sheet */}
       <div
-        className="w-full max-w-[360px] rounded-[28px] overflow-hidden"
+        className="w-full sm:max-w-[400px] overflow-hidden transition-all duration-500"
         style={{
+          borderRadius: "28px 28px 0 0",
+          ...(typeof window !== "undefined" && window.innerWidth >= 640
+            ? { borderRadius: "28px" }
+            : {}),
           background:
-            "linear-gradient(170deg, #1b1140 0%, #130d35 60%, #0f0a28 100%)",
-          border: "1px solid rgba(139,92,246,0.25)",
+            "linear-gradient(160deg, #16103a 0%, #0f0a28 50%, #090618 100%)",
+          border: "1px solid rgba(139,92,246,0.20)",
           boxShadow:
-            "0 0 0 1px rgba(0,0,0,0.4), 0 40px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06)",
+            "0 -4px 60px rgba(109,40,217,0.18), 0 0 0 1px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.07)",
+          transform: mounted ? "translateY(0)" : "translateY(30px)",
+          opacity: mounted ? 1 : 0,
         }}
       >
-        {/* top colour bar */}
+        {/* Gradient accent bar */}
         <div
-          className="h-[3px]"
+          className="h-[2px] w-full"
           style={{
-            background: "linear-gradient(90deg,#7c3aed,#6366f1,#06b6d4)",
+            background:
+              "linear-gradient(90deg,#7c3aed 0%,#818cf8 50%,#06b6d4 100%)",
           }}
         />
 
-        {/* hero */}
-        <div className="flex flex-col items-center px-6 pt-8 pb-5 gap-4">
-          {/* icon cluster */}
-          <div className="relative">
-            <div
-              className="w-[62px] h-[62px] rounded-[20px] flex items-center justify-center"
-              style={{
-                background: "rgba(124,58,237,0.15)",
-                border: "1px solid rgba(139,92,246,0.3)",
-              }}
-            >
-              <div className="text-violet-300">
-                <Icon.Globe size={26} />
-              </div>
-            </div>
-            {/* shield badge */}
-            <div
-              className="absolute -bottom-1.5 -right-1.5 w-6 h-6 rounded-full flex items-center justify-center"
-              style={{
-                background: "#0f172a",
-                border: "1.5px solid rgba(52,211,153,0.5)",
-              }}
-            >
-              <div className="text-emerald-400">
-                <Icon.Shield size={11} />
-              </div>
-            </div>
-          </div>
-
-          <div className="text-center">
-            <p className="text-[18px] font-semibold text-white/95 tracking-tight">
-              Open resource
-            </p>
-            <p className="text-[12.5px] text-white/35 mt-1 leading-snug">
-              You're about to visit an external site
-            </p>
-          </div>
+        {/* Drag handle (mobile) */}
+        <div className="flex justify-center pt-3 pb-1 sm:hidden">
+          <div className="w-10 h-1 rounded-full bg-white/10" />
         </div>
 
-        {/* url pill */}
-        <div className="mx-5 mb-4">
-          <div
-            className="flex items-center gap-3 px-3.5 py-3 rounded-[16px]"
-            style={{
-              background: "rgba(255,255,255,0.04)",
-              border: "1px solid rgba(255,255,255,0.07)",
-            }}
-          >
-            <div
-              className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-violet-400"
-              style={{
-                background: "rgba(99,102,241,0.12)",
-                border: "1px solid rgba(99,102,241,0.2)",
-              }}
-            >
-              <Icon.External size={13} />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-[13px] font-medium text-white/75 truncate">
-                {label}
-              </p>
-              <p className="text-[11px] text-white/25 font-mono truncate">
-                {hostname}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* divider */}
-        <div
-          className="mx-5 mb-4 h-px"
-          style={{ background: "rgba(255,255,255,0.05)" }}
-        />
-
-        {/* voice toggle */}
-        <div className="mx-5 mb-5">
-          <p className="text-[10px] uppercase tracking-widest text-white/20 font-semibold mb-2.5 px-0.5">
-            Options
-          </p>
-          <button
-            onClick={() => setUseVoice((v) => !v)}
-            className="w-full flex items-center justify-between px-4 py-3.5 rounded-[16px] transition-all duration-200 active:scale-[.99]"
-            style={{
-              background: useVoice
-                ? "rgba(109,40,217,0.14)"
-                : "rgba(255,255,255,0.03)",
-              border: useVoice
-                ? "1px solid rgba(139,92,246,0.32)"
-                : "1px solid rgba(255,255,255,0.07)",
-            }}
-          >
-            <div className="flex items-center gap-3">
-              {/* mic icon box */}
+        {/* ── Hero section ── */}
+        <div className="px-7 pt-6 pb-5">
+          {/* Icon + close row */}
+          <div className="flex items-start justify-between mb-6">
+            {/* Layered icon */}
+            <div className="relative">
+              {/* Outer glow ring */}
               <div
-                className="w-8 h-8 rounded-xl flex items-center justify-center transition-all"
+                className="absolute inset-0 rounded-[22px] blur-xl opacity-40"
                 style={{
-                  background: useVoice
-                    ? "rgba(124,58,237,0.22)"
-                    : "rgba(255,255,255,0.05)",
-                  border: useVoice
-                    ? "1px solid rgba(167,139,250,0.35)"
-                    : "1px solid rgba(255,255,255,0.07)",
+                  background: "radial-gradient(circle,#7c3aed,transparent)",
+                  transform: "scale(1.6)",
                 }}
-              >
-                <Icon.Mic active={useVoice} size={15} />
-              </div>
-              <div className="text-left">
-                <p
-                  className={`text-[12.5px] font-medium transition-colors ${useVoice ? "text-violet-200" : "text-white/35"}`}
-                >
-                  Voice confirmation
-                </p>
-                <p className="text-[11px] text-white/22 mt-0.5">
-                  Claude speaks when link opens
-                </p>
-              </div>
-            </div>
-            {/* pill toggle */}
-            <div className="shrink-0" style={{ width: 38, height: 21 }}>
+              />
               <div
-                className="relative w-full h-full rounded-full transition-all duration-250"
+                className="relative w-[60px] h-[60px] rounded-[20px] flex items-center justify-center"
                 style={{
-                  background: useVoice
-                    ? "rgba(124,58,237,0.75)"
-                    : "rgba(255,255,255,0.1)",
+                  background:
+                    "linear-gradient(135deg,rgba(124,58,237,0.25),rgba(99,102,241,0.15))",
+                  border: "1px solid rgba(139,92,246,0.35)",
+                  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.1)",
                 }}
               >
                 <div
-                  className="absolute top-[3px] w-[15px] h-[15px] rounded-full transition-all duration-250 shadow"
+                  className="text-violet-300"
                   style={{
-                    left: useVoice ? "calc(100% - 18px)" : "3px",
-                    background: useVoice ? "#ddd6fe" : "rgba(255,255,255,0.3)",
+                    filter: "drop-shadow(0 0 8px rgba(167,139,250,0.6))",
+                  }}
+                >
+                  <Icon.Globe size={26} />
+                </div>
+              </div>
+              {/* Shield badge */}
+              <div
+                className="absolute -bottom-2 -right-2 w-[22px] h-[22px] rounded-full flex items-center justify-center"
+                style={{
+                  background: "linear-gradient(135deg,#064e3b,#065f46)",
+                  border: "2px solid #0f172a",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.4)",
+                }}
+              >
+                <div className="text-emerald-300">
+                  <Icon.Shield size={10} />
+                </div>
+              </div>
+            </div>
+
+            {/* Close */}
+            <button
+              onClick={onCancel}
+              className="w-9 h-9 rounded-full flex items-center justify-center text-white/30 hover:text-white/70 transition-all duration-200 hover:bg-white/8"
+              style={{ border: "1px solid rgba(255,255,255,0.07)" }}
+            >
+              <Icon.X />
+            </button>
+          </div>
+
+          {/* Headline */}
+          <div className="mb-6">
+            <h2 className="text-[22px] font-bold text-white tracking-tight leading-tight mb-1.5">
+              Open resource
+            </h2>
+            <p className="text-[13px] text-white/35 leading-relaxed">
+              You're about to leave this screen and visit an external website.
+            </p>
+          </div>
+
+          {/* URL card */}
+          <div
+            className="rounded-2xl p-4 mb-6"
+            style={{
+              background: "rgba(255,255,255,0.03)",
+              border: "1px solid rgba(255,255,255,0.08)",
+            }}
+          >
+            <div className="flex items-center gap-3.5">
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-indigo-400"
+                style={{
+                  background: "rgba(99,102,241,0.12)",
+                  border: "1px solid rgba(99,102,241,0.2)",
+                }}
+              >
+                <Icon.Link size={15} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-[13.5px] font-semibold text-white/85 truncate mb-0.5">
+                  {label}
+                </p>
+                <p className="text-[11.5px] text-white/28 font-mono truncate">
+                  {hostname}
+                </p>
+              </div>
+              <div className="text-white/20 shrink-0">
+                <Icon.External size={12} />
+              </div>
+            </div>
+          </div>
+
+          {/* Divider with label */}
+          <div className="flex items-center gap-3 mb-5">
+            <div
+              className="flex-1 h-px"
+              style={{ background: "rgba(255,255,255,0.06)" }}
+            />
+            <span className="text-[10px] uppercase tracking-[0.12em] text-white/20 font-semibold">
+              Preferences
+            </span>
+            <div
+              className="flex-1 h-px"
+              style={{ background: "rgba(255,255,255,0.06)" }}
+            />
+          </div>
+
+          {/* Voice toggle */}
+          <button
+            onClick={() => setUseVoice((v) => !v)}
+            className="w-full flex items-center gap-4 p-4 rounded-2xl transition-all duration-200 active:scale-[.99] mb-6"
+            style={{
+              background: useVoice
+                ? "rgba(109,40,217,0.12)"
+                : "rgba(255,255,255,0.025)",
+              border: `1px solid ${useVoice ? "rgba(139,92,246,0.30)" : "rgba(255,255,255,0.07)"}`,
+            }}
+          >
+            {/* Mic icon box */}
+            <div
+              className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all duration-200"
+              style={{
+                background: useVoice
+                  ? "rgba(124,58,237,0.20)"
+                  : "rgba(255,255,255,0.05)",
+                border: `1px solid ${useVoice ? "rgba(167,139,250,0.35)" : "rgba(255,255,255,0.08)"}`,
+              }}
+            >
+              <Icon.Mic active={useVoice} size={16} />
+            </div>
+
+            <div className="flex-1 text-left">
+              <p
+                className={`text-[13.5px] font-semibold transition-colors mb-0.5 ${useVoice ? "text-violet-200" : "text-white/35"}`}
+              >
+                Voice confirmation
+              </p>
+              <p className="text-[11.5px] text-white/22 leading-snug">
+                Claude speaks when the link opens
+              </p>
+            </div>
+
+            {/* Toggle pill */}
+            <div
+              className="shrink-0 relative"
+              style={{ width: 42, height: 24 }}
+            >
+              <div
+                className="w-full h-full rounded-full transition-all duration-300"
+                style={{
+                  background: useVoice
+                    ? "rgba(124,58,237,0.80)"
+                    : "rgba(255,255,255,0.10)",
+                }}
+              >
+                <div
+                  className="absolute top-[4px] w-4 h-4 rounded-full transition-all duration-300 shadow-md"
+                  style={{
+                    left: useVoice ? "calc(100% - 20px)" : "4px",
+                    background: useVoice ? "#ddd6fe" : "rgba(255,255,255,0.28)",
+                    boxShadow: useVoice
+                      ? "0 0 8px rgba(167,139,250,0.5)"
+                      : "none",
                   }}
                 />
               </div>
             </div>
           </button>
+
+          {/* CTA buttons */}
+          <div className="flex flex-col gap-3">
+            <button
+              onClick={() => onOpen(useVoice)}
+              className="w-full flex items-center justify-center gap-2.5 py-4 rounded-2xl text-[14px] font-bold transition-all duration-150 active:scale-[.98] hover:brightness-110"
+              style={{
+                background: "linear-gradient(135deg,#7c3aed 0%,#6366f1 100%)",
+                border: "1px solid rgba(167,139,250,0.25)",
+                color: "#f5f3ff",
+                boxShadow:
+                  "0 8px 28px rgba(109,40,217,0.40), inset 0 1px 0 rgba(255,255,255,0.15)",
+                letterSpacing: "-0.01em",
+              }}
+            >
+              <Icon.External size={14} />
+              Open link
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                className="opacity-60"
+              >
+                <path
+                  d="M3 8h10M9 4l4 4-4 4"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+
+            <button
+              onClick={onCancel}
+              className="w-full py-3.5 rounded-2xl text-[13px] font-medium text-white/30 hover:text-white/55 transition-all duration-200"
+              style={{
+                background: "rgba(255,255,255,0.025)",
+                border: "1px solid rgba(255,255,255,0.06)",
+              }}
+            >
+              Stay on this step
+            </button>
+          </div>
         </div>
 
-        {/* CTA buttons */}
-        <div className="px-5 pb-7 flex flex-col gap-2.5">
-          <button
-            onClick={() => onOpen(useVoice)}
-            className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-[16px] text-[14px] font-semibold transition-all duration-150 active:scale-[.98]"
-            style={{
-              background: "linear-gradient(135deg,#7c3aed,#6366f1)",
-              border: "1px solid rgba(167,139,250,0.3)",
-              color: "#f5f3ff",
-              boxShadow: "0 6px 24px rgba(109,40,217,0.35)",
-            }}
-          >
-            <Icon.External size={14} />
-            Open link
-            <Icon.Arrow className="text-violet-300/70" />
-          </button>
-          <button
-            onClick={onCancel}
-            className="w-full py-3 rounded-[14px] text-[13px] font-medium text-white/30 hover:text-white/50 transition-all"
-            style={{
-              background: "rgba(255,255,255,0.03)",
-              border: "1px solid rgba(255,255,255,0.06)",
-            }}
-          >
-            Stay on this step
-          </button>
-        </div>
+        {/* Safe area spacer for mobile */}
+        <div
+          className="h-safe-bottom sm:hidden"
+          style={{
+            height: "env(safe-area-inset-bottom, 16px)",
+            background: "transparent",
+          }}
+        />
       </div>
     </div>
   );
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   INVALID LINK DIALOG — shown when URL fails validation
+   INVALID LINK DIALOG — gorgeous redesign
 ═══════════════════════════════════════════════════════════════════════════ */
 interface InvalidLinkDialogProps {
   url: string;
@@ -459,118 +554,176 @@ function InvalidLinkDialog({
   onClose,
 }: InvalidLinkDialogProps) {
   const hostname = safeHostname(url);
-
-  /* Smart fallback generation */
   const fallbacks = buildFallbacks(url, label, stepAction);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    requestAnimationFrame(() => setMounted(true));
+  }, []);
 
   return (
     <div
-      className="fixed inset-0 z-[90] flex items-end sm:items-center justify-center px-4 pb-5 sm:pb-0"
-      style={{ background: "rgba(5,4,18,0.88)", backdropFilter: "blur(14px)" }}
+      className="fixed inset-0 z-[90] flex items-end sm:items-center justify-center sm:px-4"
+      style={{
+        background: "rgba(4,3,15,0.82)",
+        backdropFilter: "blur(20px)",
+        WebkitBackdropFilter: "blur(20px)",
+      }}
     >
       <div
-        className="w-full max-w-[360px] rounded-[28px] overflow-hidden"
+        className="w-full sm:max-w-[400px] overflow-hidden transition-all duration-500"
         style={{
+          borderRadius: "28px 28px 0 0",
           background:
-            "linear-gradient(170deg,#1f0f08 0%,#160a06 60%,#0e0704 100%)",
-          border: "1px solid rgba(251,146,60,0.2)",
+            "linear-gradient(160deg, #200c06 0%, #150704 50%, #0e0503 100%)",
+          border: "1px solid rgba(251,146,60,0.18)",
           boxShadow:
-            "0 0 0 1px rgba(0,0,0,0.5), 0 40px 80px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,255,255,0.04)",
+            "0 -4px 60px rgba(220,38,38,0.12), 0 0 0 1px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05)",
+          transform: mounted ? "translateY(0)" : "translateY(30px)",
+          opacity: mounted ? 1 : 0,
         }}
       >
-        {/* top bar */}
+        {/* Accent bar */}
         <div
-          className="h-[3px]"
+          className="h-[2px]"
           style={{
-            background: "linear-gradient(90deg,#dc2626,#ea580c,#f59e0b)",
+            background:
+              "linear-gradient(90deg,#dc2626 0%,#ea580c 50%,#f59e0b 100%)",
           }}
         />
 
-        {/* header row */}
-        <div className="flex items-start justify-between px-5 pt-6 pb-4">
-          <div className="flex items-start gap-3">
-            <div
-              className="w-11 h-11 rounded-[16px] flex items-center justify-center shrink-0"
-              style={{
-                background: "rgba(234,88,12,0.14)",
-                border: "1px solid rgba(251,146,60,0.28)",
-              }}
-            >
-              <div className="text-orange-400">
-                <Icon.Warn size={18} />
-              </div>
-            </div>
-            <div className="pt-0.5">
-              <p className="text-[15px] font-semibold text-white/90 tracking-tight">
-                Link unavailable
-              </p>
-              <p className="text-[11px] text-white/28 mt-0.5 font-mono truncate max-w-[175px]">
-                {hostname}
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            className="w-8 h-8 rounded-xl flex items-center justify-center text-white/30 hover:text-white/55 transition-all mt-0.5"
-            style={{
-              background: "rgba(255,255,255,0.05)",
-              border: "1px solid rgba(255,255,255,0.07)",
-            }}
-          >
-            <Icon.X />
-          </button>
+        {/* Drag handle */}
+        <div className="flex justify-center pt-3 pb-1 sm:hidden">
+          <div className="w-10 h-1 rounded-full bg-white/10" />
         </div>
 
-        <div className="px-5 pb-6">
-          <p className="text-[12.5px] text-white/38 leading-relaxed mb-4">
-            This link couldn't be reached — it may be down, incorrect, or
-            region-restricted. Here are some alternatives that should work:
+        <div className="px-7 pt-6 pb-7">
+          {/* Header row */}
+          <div className="flex items-start justify-between mb-6">
+            <div className="flex items-center gap-4">
+              {/* Warning icon */}
+              <div className="relative">
+                <div
+                  className="absolute inset-0 rounded-[18px] blur-xl opacity-30"
+                  style={{
+                    background: "radial-gradient(circle,#ea580c,transparent)",
+                    transform: "scale(1.5)",
+                  }}
+                />
+                <div
+                  className="relative w-[52px] h-[52px] rounded-[18px] flex items-center justify-center"
+                  style={{
+                    background:
+                      "linear-gradient(135deg,rgba(234,88,12,0.20),rgba(220,38,38,0.12))",
+                    border: "1px solid rgba(251,146,60,0.28)",
+                    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08)",
+                  }}
+                >
+                  <div
+                    className="text-orange-400"
+                    style={{
+                      filter: "drop-shadow(0 0 6px rgba(251,146,60,0.5))",
+                    }}
+                  >
+                    <Icon.Warn size={20} />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h2 className="text-[19px] font-bold text-white/95 tracking-tight leading-tight mb-1">
+                  Link unavailable
+                </h2>
+                <p className="text-[11.5px] text-white/25 font-mono truncate max-w-[180px]">
+                  {hostname}
+                </p>
+              </div>
+            </div>
+
+            {/* Close */}
+            <button
+              onClick={onClose}
+              className="w-9 h-9 rounded-full flex items-center justify-center text-white/25 hover:text-white/60 transition-all duration-200 hover:bg-white/6"
+              style={{ border: "1px solid rgba(255,255,255,0.07)" }}
+            >
+              <Icon.X />
+            </button>
+          </div>
+
+          {/* Description */}
+          <p className="text-[13px] text-white/35 leading-relaxed mb-6">
+            This link couldn't be reached — it may be temporarily down,
+            incorrect, or region-restricted. Try one of these alternatives:
           </p>
 
-          {/* fallback list */}
-          <div className="flex flex-col gap-2 mb-4">
-            {fallbacks.map((fb) => (
+          {/* Divider */}
+          <div className="flex items-center gap-3 mb-4">
+            <div
+              className="flex-1 h-px"
+              style={{ background: "rgba(255,255,255,0.06)" }}
+            />
+            <span className="text-[10px] uppercase tracking-[0.12em] text-white/18 font-semibold">
+              Alternatives
+            </span>
+            <div
+              className="flex-1 h-px"
+              style={{ background: "rgba(255,255,255,0.06)" }}
+            />
+          </div>
+
+          {/* Fallback list */}
+          <div className="flex flex-col gap-2.5 mb-6">
+            {fallbacks.map((fb, i) => (
               <a
                 key={fb.url}
                 href={fb.url}
                 target="_blank"
                 rel="noreferrer"
                 onClick={onClose}
-                className="group flex items-center justify-between gap-3 px-3.5 py-3 rounded-[14px] transition-all duration-150 hover:scale-[1.01] active:scale-[.99]"
+                className="group flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all duration-200 hover:scale-[1.015] active:scale-[.99]"
                 style={{
                   background: "rgba(255,255,255,0.03)",
                   border: "1px solid rgba(255,255,255,0.07)",
+                  animationDelay: `${i * 60}ms`,
                 }}
               >
-                <div className="flex items-center gap-3">
-                  <div
-                    className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-violet-400 transition-colors group-hover:text-violet-300"
-                    style={{
-                      background: "rgba(109,40,217,0.13)",
-                      border: "1px solid rgba(109,40,217,0.2)",
-                    }}
-                  >
-                    {fb.isSearch ? (
-                      <Icon.Search size={13} />
-                    ) : (
-                      <Icon.External size={13} />
-                    )}
-                  </div>
-                  <div>
-                    <p className="text-[12.5px] font-medium text-white/70 group-hover:text-white/90 transition-colors">
-                      {fb.name}
-                    </p>
-                    <p className="text-[11px] text-white/28">{fb.desc}</p>
-                  </div>
+                {/* Icon */}
+                <div
+                  className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-violet-400 transition-all duration-200 group-hover:text-violet-300"
+                  style={{
+                    background: "rgba(109,40,217,0.12)",
+                    border: "1px solid rgba(109,40,217,0.18)",
+                  }}
+                >
+                  {fb.isSearch ? (
+                    <Icon.Search size={14} />
+                  ) : (
+                    <Icon.External size={14} />
+                  )}
                 </div>
-                <Icon.Arrow className="text-white/20 group-hover:text-violet-400 transition-colors shrink-0" />
+
+                {/* Text */}
+                <div className="flex-1 min-w-0">
+                  <p className="text-[13px] font-semibold text-white/65 group-hover:text-white/90 transition-colors truncate mb-0.5">
+                    {fb.name}
+                  </p>
+                  <p className="text-[11px] text-white/22 truncate">
+                    {fb.desc}
+                  </p>
+                </div>
+
+                {/* Arrow */}
+                <div className="text-white/15 group-hover:text-violet-400 transition-colors shrink-0">
+                  <Icon.Arrow />
+                </div>
               </a>
             ))}
           </div>
 
+          {/* Dismiss */}
           <button
             onClick={onClose}
-            className="w-full py-2.5 rounded-[12px] text-[12.5px] text-white/28 hover:text-white/48 transition-all"
+            className="w-full py-3.5 rounded-2xl text-[13px] font-medium text-white/28 hover:text-white/50 transition-all duration-200"
             style={{
               background: "rgba(255,255,255,0.025)",
               border: "1px solid rgba(255,255,255,0.05)",
@@ -579,6 +732,9 @@ function InvalidLinkDialog({
             Dismiss — continue with steps
           </button>
         </div>
+
+        {/* Safe area */}
+        <div style={{ height: "env(safe-area-inset-bottom, 12px)" }} />
       </div>
     </div>
   );
@@ -607,7 +763,6 @@ function buildFallbacks(
 ): Fallback[] {
   const ctx = `${url} ${label} ${stepAction}`.toLowerCase();
   const results: Fallback[] = [];
-
   if (/job|employ|work|career|hiring/.test(ctx)) {
     results.push({
       name: "Naukri",
@@ -690,8 +845,6 @@ function buildFallbacks(
       desc: "Loans & credit",
     });
   }
-
-  // Always add: Google search for the label
   const q = encodeURIComponent(`${label || stepAction} official website India`);
   results.push({
     name: "Search on Google",
@@ -699,11 +852,9 @@ function buildFallbacks(
     desc: "Find the official page",
     isSearch: true,
   });
-
   return results.slice(0, 4);
 }
 
-/* ─── URL validation — two-stage: format + reachability ─────────────────── */
 function isWellFormedUrl(raw: string): boolean {
   try {
     const u = new URL(raw);
@@ -718,13 +869,11 @@ async function isReachable(url: string): Promise<boolean> {
     const { hostname, protocol } = new URL(url);
     const img = new Image();
     const t = setTimeout(() => resolve(false), 5_000);
-
     img.onload = () => {
       clearTimeout(t);
       resolve(true);
     };
     img.onerror = () => {
-      // favicon 404 still means host resolved; escalate to HEAD
       fetch(url, {
         method: "HEAD",
         mode: "no-cors",
@@ -758,7 +907,6 @@ export default function TunnelScreen({
   stressLevel,
   onDone,
 }: TunnelScreenProps) {
-  /* ── state ── */
   const [currentStep, setCurrentStep] = useState(0);
   const [completed, setCompleted] = useState<number[]>([]);
   const [animKey, setAnimKey] = useState(0);
@@ -769,7 +917,6 @@ export default function TunnelScreen({
   const [voiceReply, setVoiceReply] = useState("");
   const [linkChecking, setLinkChecking] = useState(false);
 
-  // dialogs
   const [openDialog, setOpenDialog] = useState<{
     url: string;
     label: string;
@@ -782,7 +929,6 @@ export default function TunnelScreen({
     stepAction: string;
   } | null>(null);
 
-  /* ── refs ── */
   const recogRef = useRef<any>(null);
   const silenceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const shouldListenRef = useRef(true);
@@ -798,7 +944,6 @@ export default function TunnelScreen({
   const total = crisis.steps.length;
   const pct = Math.round(((currentStep + 1) / total) * 100);
 
-  /* ── TTS ── */
   const speak = useCallback((text: string) => {
     window.speechSynthesis.cancel();
     const fire = () => {
@@ -843,7 +988,6 @@ export default function TunnelScreen({
     }
   }, []);
 
-  /* ── step speech ── */
   const stepSpeech = (i: number) => {
     const s = crisis.steps[i];
     if (!s) return "";
@@ -864,7 +1008,6 @@ export default function TunnelScreen({
     setTimeout(() => setToastVisible(false), 2800);
   };
 
-  /* ── prompt open link dialog ── */
   const promptLink = (url: string, label: string, stepAction: string) => {
     setOpenDialog({ url, label, stepAction, hostname: safeHostname(url) });
     speak(
@@ -872,7 +1015,6 @@ export default function TunnelScreen({
     );
   };
 
-  /* ── confirmed open — validate then navigate or show invalid dialog ── */
   const doOpenLink = async (
     url: string,
     label: string,
@@ -885,10 +1027,8 @@ export default function TunnelScreen({
       toast("Checking link…");
       speak("Checking the link, one moment.");
     } else toast("Checking link…");
-
     const ok = await validateUrl(url);
     setLinkChecking(false);
-
     if (ok) {
       if (useVoice) {
         toast("Opening link…");
@@ -904,7 +1044,6 @@ export default function TunnelScreen({
     }
   };
 
-  /* ── voice recognition ── */
   const listen = useCallback(() => {
     if (!shouldListenRef.current || finished) return;
     const SR =
@@ -943,7 +1082,6 @@ export default function TunnelScreen({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [finished]);
 
-  /* ── advance step ── */
   const goNext = useCallback(() => {
     setCompleted((p) => [...p, currentStep]);
     if (isLast) {
@@ -963,7 +1101,6 @@ export default function TunnelScreen({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentStep, isLast, speak, onDone]);
 
-  /* ── intent matchers ── */
   const isNext = (t: string) =>
     /\b(ok|okay|next|done|got it|yes|sure|continue|alright|yep|yeah|proceed|ready|go|move|complete)\b/.test(
       t,
@@ -981,12 +1118,9 @@ export default function TunnelScreen({
   const isCancel = (t: string) =>
     /\b(cancel|no|stop|dismiss|back|close|never mind|don.t)\b/.test(t);
 
-  /* ── process voice ── */
   const handleVoice = async (text: string) => {
     const t = text.toLowerCase();
     const active = crisis.steps[stepRef.current];
-
-    // dialog voice shortcuts
     if (openDialog) {
       if (isConfirm(t)) {
         await doOpenLink(
@@ -1007,7 +1141,6 @@ export default function TunnelScreen({
         return;
       }
     }
-
     if (isRepeat(t)) {
       toast("Repeating step…");
       speak(stepSpeech(stepRef.current));
@@ -1038,8 +1171,6 @@ export default function TunnelScreen({
       }, 600);
       return;
     }
-
-    // conversational AI fallback
     toast("Thinking…");
     speak("One moment.");
     convoRef.current = [
@@ -1079,7 +1210,6 @@ RULES: 2-3 spoken sentences max. No markdown. End with: they can say "okay" to c
     }, 1400);
   };
 
-  /* ── step-change effect ── */
   useEffect(() => {
     if (!step) return;
     stepRef.current = currentStep;
@@ -1091,7 +1221,6 @@ RULES: 2-3 spoken sentences max. No markdown. End with: they can say "okay" to c
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentStep]);
 
-  /* ── cleanup ── */
   useEffect(() => {
     shouldListenRef.current = true;
     return () => {
@@ -1102,7 +1231,6 @@ RULES: 2-3 spoken sentences max. No markdown. End with: they can say "okay" to c
     };
   }, []);
 
-  /* ── done screen ── */
   if (finished)
     return (
       <div className="fixed inset-0 bg-[#08061a] flex flex-col items-center justify-center px-6">
@@ -1136,10 +1264,8 @@ RULES: 2-3 spoken sentences max. No markdown. End with: they can say "okay" to c
       </div>
     );
 
-  /* ── main ── */
   return (
     <>
-      {/* Dialogs */}
       {openDialog && (
         <OpenLinkDialog
           url={openDialog.url}
@@ -1168,11 +1294,9 @@ RULES: 2-3 spoken sentences max. No markdown. End with: they can say "okay" to c
         />
       )}
 
-      {/* Page */}
       <div
         className={`fixed inset-0 flex flex-col w-full items-center px-5 py-10 overflow-hidden ${isCrit ? "bg-[#180808]" : "bg-[#08061a]"}`}
       >
-        {/* ambient blobs */}
         <div
           className="absolute pointer-events-none"
           style={{
@@ -1184,7 +1308,7 @@ RULES: 2-3 spoken sentences max. No markdown. End with: they can say "okay" to c
         />
 
         <div className="relative z-10 flex flex-col gap-4 w-full max-w-lg mx-auto h-full">
-          {/* ── header ── */}
+          {/* Header */}
           <div className="flex flex-col gap-3">
             <div className="flex items-start justify-between gap-3">
               <div>
@@ -1217,8 +1341,6 @@ RULES: 2-3 spoken sentences max. No markdown. End with: they can say "okay" to c
                 </span>
               </div>
             </div>
-
-            {/* step dots */}
             <div className="flex items-center">
               {crisis.steps.map((_, i) => (
                 <StepDot
@@ -1232,7 +1354,6 @@ RULES: 2-3 spoken sentences max. No markdown. End with: they can say "okay" to c
             </div>
           </div>
 
-          {/* ── emergency call ── */}
           {crisis.emergencyCall && currentStep === 0 && (
             <a
               href={`tel:${crisis.emergencyCall}`}
@@ -1242,7 +1363,7 @@ RULES: 2-3 spoken sentences max. No markdown. End with: they can say "okay" to c
             </a>
           )}
 
-          {/* ── step card ── */}
+          {/* Step card */}
           <div
             key={animKey}
             className="rounded-[22px] relative overflow-hidden"
@@ -1258,7 +1379,6 @@ RULES: 2-3 spoken sentences max. No markdown. End with: they can say "okay" to c
           >
             <div className="absolute -top-12 -right-12 w-32 h-32 rounded-full border border-white/4 pointer-events-none" />
             <div className="absolute -bottom-10 -left-10 w-24 h-24 rounded-full border border-white/3 pointer-events-none" />
-
             <div
               className="relative z-10 flex flex-col px-5 pt-5 pb-4 gap-3"
               style={{ minHeight: 220 }}
@@ -1273,7 +1393,6 @@ RULES: 2-3 spoken sentences max. No markdown. End with: they can say "okay" to c
                   </span>
                 )}
               </div>
-
               <div className="flex-1 flex flex-col items-center justify-center gap-2 text-center py-3">
                 <h2 className="text-[21px] font-semibold text-white/95 leading-snug tracking-tight">
                   {step?.action}
@@ -1282,7 +1401,6 @@ RULES: 2-3 spoken sentences max. No markdown. End with: they can say "okay" to c
                   {step?.detail}
                 </p>
               </div>
-
               <div className="flex items-center justify-center gap-1.5">
                 <span
                   className={`w-1.5 h-1.5 rounded-full shrink-0 transition-colors ${voiceListening ? "bg-violet-400 animate-pulse" : "bg-white/12"}`}
@@ -1295,8 +1413,6 @@ RULES: 2-3 spoken sentences max. No markdown. End with: they can say "okay" to c
                     : "Waiting…"}
                 </span>
               </div>
-
-              {/* progress bar */}
               <div className="h-[3px] rounded-full bg-white/6 overflow-hidden">
                 <div
                   className="h-full rounded-full transition-[width] duration-700 ease-in-out"
@@ -1311,7 +1427,6 @@ RULES: 2-3 spoken sentences max. No markdown. End with: they can say "okay" to c
             </div>
           </div>
 
-          {/* ── AI reply ── */}
           {voiceReply && (
             <div
               className="flex items-start gap-3 px-4 py-3.5 rounded-[16px] border border-violet-500/18 bg-violet-900/8"
@@ -1324,7 +1439,6 @@ RULES: 2-3 spoken sentences max. No markdown. End with: they can say "okay" to c
             </div>
           )}
 
-          {/* ── link button ── */}
           {step?.link && (
             <button
               onClick={() =>
@@ -1355,7 +1469,6 @@ RULES: 2-3 spoken sentences max. No markdown. End with: they can say "okay" to c
             </button>
           )}
 
-          {/* ── next button ── */}
           <button
             onClick={goNext}
             className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-[16px] text-[14px] font-semibold border transition-all duration-150 hover:opacity-90 active:scale-[.98]

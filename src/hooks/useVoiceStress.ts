@@ -13,7 +13,24 @@ export const useVoiceStress = () => {
       (window as any).webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
-      alert("Please use Chrome browser");
+      alert("Speech recognition is not supported. Please use Chrome.");
+      return;
+    }
+
+    // Microphone requires a secure origin (https:// or localhost).
+    // Plain http:// on an IP address is blocked by browsers.
+    const isSecure =
+      window.location.protocol === "https:" ||
+      window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1";
+
+    if (!isSecure) {
+      alert(
+        "Microphone access requires a secure connection.\n\n" +
+          "Please open the app at:\n" +
+          "• http://localhost:3000  (same machine)\n" +
+          "• https://10.148.126.28:3000  (other devices — needs HTTPS setup)",
+      );
       return;
     }
 
@@ -26,7 +43,6 @@ export const useVoiceStress = () => {
     recognition.onend = () => setListening(false);
 
     recognition.onresult = (event: any) => {
-      // Clear previous silence timer on every new word
       if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
 
       const result = event.results[event.results.length - 1];
@@ -36,7 +52,6 @@ export const useVoiceStress = () => {
       if (result.isFinal) {
         setTranscript(text);
 
-        // Stress: filler words + low confidence + word count speed
         const lc = text.toLowerCase();
         const fillers = ["um", "uh", "like", "i mean", "you know"];
         const fillerCount = fillers.reduce(
@@ -55,7 +70,6 @@ export const useVoiceStress = () => {
         );
         setVoiceStress(stress);
 
-        // Fire after 600ms of silence — feels instant but won't cut mid-sentence
         silenceTimerRef.current = setTimeout(() => {
           recognition.stop();
           onResult(text);
@@ -64,8 +78,16 @@ export const useVoiceStress = () => {
     };
 
     recognition.onerror = (event: any) => {
-      console.error("Speech recognition error:", event.error);
       setListening(false);
+      if (event.error === "not-allowed") {
+        alert(
+          "Microphone access was denied.\n\n" +
+            "This usually happens when accessing via http:// on a network IP.\n\n" +
+            "Fix: Open the app at http://localhost:3000 instead, or set up HTTPS.",
+        );
+      } else {
+        console.error("Speech recognition error:", event.error);
+      }
     };
 
     recognitionRef.current = recognition;

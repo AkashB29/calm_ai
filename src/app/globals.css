@@ -4,6 +4,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
 :root {
@@ -21,6 +22,7 @@
 html,
 body {
   min-height: 100%;
+  height: 100%;
   background: radial-gradient(
     circle at top,
     #30214f 0%,
@@ -28,21 +30,61 @@ body {
     #02050b 100%
   );
   color: #f8fafc;
+  /* Prevent overscroll bounce on iOS */
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 body {
   background-color: transparent;
 }
 
-button,
+/* ── Inputs & textareas ── */
 textarea,
 input {
   font: inherit;
+  /* Remove iOS inner shadow */
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 0;
 }
 
-/* Custom utility classes for consistency */
+/* ── Buttons: NO global transition — each component owns its own ── */
+button {
+  font: inherit;
+  cursor: pointer;
+  /* No transition here — avoids stuck-hover on mobile */
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation; /* prevents 300ms delay on iOS */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Only apply transitions to anchor tags globally */
+a {
+  transition:
+    opacity 0.15s ease,
+    color 0.15s ease;
+}
+
+/* Focus states for accessibility — only keyboard, not touch */
+*:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 2px;
+}
+
+/* Remove focus ring on mouse/touch click */
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* ── Custom utility classes ── */
 @layer utilities {
-  /* Line clamp utilities */
   .line-clamp-2 {
     overflow: hidden;
     display: -webkit-box;
@@ -56,28 +98,12 @@ input {
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
   }
-}
 
-/* Smooth transitions for interactive elements */
-button,
-a,
-textarea,
-input {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Focus states for accessibility */
-*:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.5);
-  outline-offset: 2px;
-}
-
-/* Remove default tap highlight on mobile */
-* {
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
+  /* Safe area padding for notched phones */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
 }
